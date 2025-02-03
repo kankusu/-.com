@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>進路選択サポート</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 20px;
+    }
+    h1 {
+      color: #007bff;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>進路選択サポート</h1>
+    <p>興味のある分野を選択してください：</p>
+    <select id="interest" onchange="toggleLanguageOptions()">
+      <option value="" disabled selected>分野を選択</option>
+      <option value="science">理系（科学・工学）</option>
+      <option value="humanities">文系（文学・歴史）</option>
+      <option value="art">アート・デザイン</option>
+      <option value="business">ビジネス・経済</option>
+      <option value="health">医療・福祉</option>
+      <option value="language">語学</option>
+    </select>
+
+    <div id="language-container" class="hidden">
+      <p>学びたい言語を選んでください：</p>
+      <select id="language">
+        <option value="" disabled selected>言語を選択</option>
+        <option value="english">英語</option>
+        <option value="french">フランス語</option>
+        <option value="chinese">中国語</option>
+        <option value="spanish">スペイン語</option>
+        <option value="korean">韓国語</option>
+        <option value="german">ドイツ語</option>
+      </select>
+    </div>
+
+    <p>進路を選択してください：</p>
+    <select id="path" onchange="toggle偏差値()">
+      <option value="" disabled selected>進路を選択</option>
+      <option value="study">進学する</option>
+      <option value="work">就職する</option>
+    </select>
+
+    <div id="偏差値-container" class="hidden">
+      <p>目指す偏差値を選んでください：</p>
+      <select id="hensachi">
+        <option value="" disabled selected>偏差値を選択</option>
+        <option value="high">偏差値65以上（難関大学）</option>
+        <option value="medium">偏差値50〜65（一般大学）</option>
+        <option value="low">偏差値50未満（専門学校・地方大学など）</option>
+      </select>
+    </div>
+
+    <button onclick="showRecommendation()">確認する</button>
+
+    <div id="recommendation" class="result"></div>
+  </div>
+
+  <script>
+    // 「語学」を選んだ場合に言語選択メニューを表示
+    function toggleLanguageOptions() {
+      const interest = document.getElementById('interest').value;
+      const languageContainer = document.getElementById('language-container');
+      if (interest === 'language') {
+        languageContainer.classList.remove('hidden');
+      } else {
+        languageContainer.classList.add('hidden');
+      }
+    }
+
+    // 偏差値選択メニューを表示/非表示にする関数
+    function toggle偏差値() {
+      const path = document.getElementById('path').value;
+      const hensachiContainer = document.getElementById('偏差値-container');
+      if (path === 'study') {
+        hensachiContainer.classList.remove('hidden');
+      } else {
+        hensachiContainer.classList.add('hidden');
+      }
+    }
+
+    // 推薦メッセージを表示する関数
+    function showRecommendation() {
+      const interest = document.getElementById('interest').value;
+      const path = document.getElementById('path').value;
+      const hensachi = document.getElementById('hensachi').value;
+      const language = document.getElementById('language').value;
+      const recommendation = document.getElementById('recommendation');
+
+      let message = '';
+
+      if (path === 'study') {
+        if (hensachi === '' && interest === 'language') {
+          message = '偏差値を選択してください。';
+        } else {
+          // 進学アドバイス（最低3つの候補を提示）
+          if (interest === 'language') {
+            switch (language) {
+              case 'english':
+              if (hensachi === 'high')
+                message = '<b>英語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.tufs.ac.jp/education/lc//" target="_blank">東京外国語大学</a></li>' +
+                          '<li><a href="https://www.google.com/search?q=%E6%97%A9%E7%A8%B2%E7%94%B0%E5%A4%A7%E5%AD%A6%E5%9B%BD%E9%9A%9B%E6%95%99%E9%A4%8A%E5%AD%A6%E9%83%A8&rlz=1C5MACD_enJP1050JP1051&oq=%E6%97%A9%E7%A8%B2%E7%94%B0%E5%A4%A7%E5%AD%A6%E5%9B%BD%E9%9A%9B%E6%95%99%E9%A4%8A%E5%AD%A6%E9%83%A8&gs_lcrp=EgZjaHJvbWUyCQgAEEUYORiABDIHCAEQABiABDIHCAIQABiABDIHCAMQABiABDIHCAQQABiABDIHCAUQABiABDIHCAYQABiABDIHCAcQABiABDIHCAgQABiABDIHCAkQABiABNIBCTc5MjFqMGoxNagCCLACAQ&sourceid=chrome&ie=UTF-8/" target="_blank">早稲田大学国際教養学部</a></li>' +
+                          '<li><a href="https://www.rikkyo.ac.jp/undergraduate/ic/" target="_blank">立教大学 異文化コミュニケーション学部 池袋キャンパス</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'medium')
+                message = '<b>英語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.ritsumei.ac.jp//" target="_blank">立命館大学</a></li>' +
+                          '<li><a href="https://www.aoyama.ac.jp//" target="_blank">青山学院大学</a></li>' +
+                          '<li><a href="https://www.ryukoku.ac.jp//" target="_blank">龍谷大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'low')
+                message = '<b>英語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://hotel.ymsch.jp//" target="_blank">東京ＹＭＣＡ国際ホテル専門学校</a></li>' +
+                          '<li><a href="https://www.miss-paris.ac.jp/omiya//" target="_blank">ミス・パリ・ビューティ専門学校</a></li>' +
+                          '<li><a href="https://www.tca.ac.jp/creative//" target="_blank">東京コミュニケーションアート専門学校</a></li>' +
+                          '</ul>';
+                break;
+              case 'french':
+              if (hensachi === 'high')  
+                message = '<b>フランス語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://kokushin-u.jp/profs//" target="_blank">国際信州学院大学</a></li>' +
+                          '<li><a href="https://www.tiu.ac.jp/department/language///" target="_blank">東京国際大学</a></li>' +
+                          '<li><a href="https://www.sophia.ac.jp/jpn/academics/g/g_human/g_human_flit//" target="_blank">上智大学フランス語専攻科</a></li>' +
+                          '<li><a href="http://flas.waseda.jp/french//" target="_blank">早稲田大学 文学部 フランス文学科</a></li>' +
+                          
+                          '</ul>';
+
+
+              if (hensachi === 'medium')  
+                message = '<b>フランス語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.senshu-u.ac.jp//" target="_blank">専修大学</a></li>' +
+                          '<li><a href="https://www.u-toyama.ac.jp//" target="_blank">富山大学</a></li>' +
+                          '<li><a href="https://www.teikyo-u.ac.jp//" target="_blank">帝京大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'low')  
+                message = '<b>フランス語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://kokusai-seika.com//" target="_blank">国際製菓専門学校</a></li>' +
+                          '<li><a href="https://www.fflc.ac.jp//" target="_blank">福岡外語専門学校</a></li>' +
+                          '<li><a href="https://www.daito.ac.jp//" target="_blank">大東文化大学</a></li>' +
+                          '</ul>';
+                break;
+              case 'chinese':
+              if (hensachi === 'high')   
+                message = '<b>中国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.chuo-u.ac.jp/academics/faculties/letters/major/chinese//" target="_blank">中央大学</a></li>' +
+                          '<li><a href="https://www.kansai-u.ac.jp/allcom/foreign/chinese/index.html/" target="_blank">関西大学</a></li>' +
+                          '<li><a href="https://www.coelang.tufs.ac.jp/mt/zh/index.html/" target="_blank">東京外国語大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'medium')   
+                message = '<b>中国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.shinshu-u.ac.jp/faculty/arts/course/ch-literature/" target="_blank">信州大学</a></li>' +
+                          '<li><a href="https://www.bunkyo.ac.jp/department/language_and_literature/chinese//" target="_blank">文教大学</a></li>' +
+                          '<li><a href="https://www.kandagaigo.ac.jp/kuis/main/faculties/fl_as/cn//" target="_blank">神田外語大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'low')   
+                message = '<b>中国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.jcfl.ac.jp/course/curriculum/a-c.html/" target="_blank">日本外国語大学</a></li>' +
+                          '<li><a href="https://www.gaigo.ac.jp//" target="_blank">広島外国語専門学校</a></li>' +
+                          '<li><a href="https://www.rizhong.org//" target="_blank">日中学院</a></li>' +
+                          '</ul>';
+                break;
+              case 'spanish':
+              if (hensachi === 'high')    
+                message = '<b>スペイン語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.aichi-pu.ac.jp/academics/foreign_studies/european_studies_spain/index.html/" target="_blank">愛知県立大学</a></li>' +
+                          '<li><a href="https://www.sfs.osaka-u.ac.jp/about_fs/edu_fl_spa.html/" target="_blank">大阪大学</a></li>' +
+                          '<li><a href="https://www.kanagawa-u.ac.jp/education/faculty/foreign_languages/about/spanish//" target="_blank">神奈川大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'medium')    
+                message = '<b>スペイン語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://sis.w3.kanazawa-u.ac.jp/" target="_blank">金沢大学</a></li>' +
+                          '<li><a href="https://www.kansaigaidai.ac.jp/academics/cfs/spanish//" target="_blank">関西外国語大学</a></li>' +
+                          '<li><a href="https://www.kufs.ac.jp/faculties/unv_spanish.html" target="_blank">京都外国語大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'low')    
+                message = '<b>スペイン語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.kandagaigo.ac.jp/kuis/main/faculties/fl_ib/sp//" target="_blank">神田外国語学院</a></li>' +
+                          '<li><a href="https://life.tyg.jp/faculty/global_communications/multilingual.html/" target="_blank">東洋学園大学</a></li>' +
+                          '<li><a href="https://tg-group.ac.jp/kansaigaigo/kg/daigaku/02/06.html/" target="_blank">関西外国語専門学校</a></li>' +
+                          '</ul>';
+                break;
+              case 'korean':
+              if (hensachi === 'high')  
+                message = '<b>韓国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.aasa.ac.jp/communication//" target="_blank">愛知淑徳大学</a></li>' +
+                          '<li><a href="https://www.ohkagakuen-u.ac.jp/edu-kokusai//" target="_blank">桜花学園</a></li>' +
+                          '<li><a href="https://www.sfs.osaka-u.ac.jp/about_fs/edu_fl_kor.html/" target="_blank">大阪大学</a></li>' +
+                          '</ul>';
+
+
+              if (hensachi === 'medium')  
+                message = '<b>韓国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.osaka-sandai.ac.jp/fc/in/in//" target="_blank">大阪産業大学</a></li>' +
+                          '<li><a href="https://www.kansaigaidai.ac.jp/international/affiliation/prglist/foreign//" target="_blank">関西外国語大学</a></li>' +
+                          '<li><a href="https://www.kiu.ac.jp/faculty/business/course/sociology/course07//" target="_blank">九州国際大学</a></li>' +
+                          '</ul>';
+
+
+              if (hensachi === 'low')  
+                message = '<b>韓国語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.tit.ac.jp/department/korean//" target="_blank">東京ホスピタリティ・アカデミー</a></li>' +
+                          '<li><a href="https://kokusai.ecc.ac.jp/course/asia//" target="_blank">ECC国際外語専門学校</a></li>' +
+                          '<li><a href="https://yoshida-global.jp//" target="_blank">北海道グローバル外語専門学校</a></li>' +
+                          '</ul>';
+                break;
+              case 'german':
+              if (hensachi === 'high')  
+                message = '<b>ドイツ語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.l.u-tokyo.ac.jp/dokubun//" target="_blank">東京大学</a></li>' +
+                          '<li><a href="https://www.z.k.kyoto-u.ac.jp/freshman-guide/language/german/" target="_blank">京都大学</a></li>' +
+                          '<li><a href="https://international.doshisha.ac.jp/oia/study_abroad_program/eucampusprogram/eucampusprogram_depg.html/" target="_blank">同志社大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'medium')  
+                message = '<b>ドイツ語を学ぶ進路候補:</b><ul>' +
+                          '<li><a href="https://www.kokugakuin.ac.jp/education/fd/letters/doflacs/curriculum/" target="_blank">國學院大学</a></li>' +
+                          '<li><a href="https://www.cegloc.tsukuba.ac.jp/page/dir000571.html/" target="_blank">筑波大学</a></li>' +
+                          '<li><a href="https://www.nanzan-u.ac.jp/Dept/fg/top.html/" target="_blank">南山大学</a></li>' +
+                          '</ul>';
+
+
+                          if (hensachi === 'low')  
+                message = '<b>ドイツ語を学ぶ進路候補:</b><ul>' +
+                           '<li><a href="https://www.iuk.ac.jp//" target="_blank">鹿児島国際大学</a></li>' +
+                          '<li><a href="https://www.nagasaki-gaigo.ac.jp/german//" target="_blank">長崎外国語大学</a></li>' +
+                          '<li><a href="https://www.tenri-u.ac.jp/faculty/international/foreign//" target="_blank">天理大学</a></li>' +
+                          '</ul>';
+                break;
+              default:
+                message = '学びたい言語を選択してください。';
+            }
+          } else if (interest === 'science') {
+            if (hensachi === 'high')
+            message = '<b>理系に興味があるなら、大学の工学部や理学部、情報工学系学科などを検討してみてください。</b><ul>' +
+                      '<li><a href="https://www2.sci.hokudai.ac.jp//" target="_blank">北海道大学 理学部</a></li>' +
+                      '<li><a href="https://www.icu.ac.jp/about/whyicu/page_41.html/" target="_blank">国際基督大学</a></li>' +
+                      '<li><a href="https://educ.titech.ac.jp/cs//" target="_blank">北海道大学 理学部</a></li>' +
+                      '</ul>';
+
+            if (hensachi === 'medium')
+            message = '<b>理系に興味があるなら、大学の工学部や理学部、情報工学系学科などを検討してみてください。</b><ul>' +
+                      '<li><a href="http://www.sci.kobe-u.ac.jp//" target="_blank">神戸大学 理学部</a></li>' +
+                      '<li><a href="https://science.rikkyo.ac.jp//" target="_blank">立教大学 理学部</a></li>' +
+                      '<li><a href="https://www.tus.ac.jp//" target="_blank">東京理科大学</a></li>' +
+                      '</ul>';
+
+                      if (hensachi === 'low')
+            message = '<b>理系に興味があるなら、大学の工学部や理学部、情報工学系学科などを検討してみてください。</b><ul>' +
+                      '<li><a href="https://www2.sci.hokudai.ac.jp//" target="_blank">明治学院大学 情報数理学部</a></li>' +
+                      '<li><a href="https://nyushi.otaru-uc.ac.jp/department/science//" target="_blank">小樽商科大学</a></li>' +
+                      '<li><a href="https://www.tid.ac.jp//" target="_blank">東京情報デザイン専門職大学</a></li>' +
+                      '</ul>';
+
+
+          } else if (interest === 'humanities') {
+            if (hensachi === 'high')
+            message = '<b>文系に興味があるなら、文学部や法学部、社会学部などがおすすめです。</b><ul>' +
+                      '<li><a href="https://www.sophia.ac.jp/jpn/academics/ug/ug_human//" target="_blank">上智大学 文学部</a></li>' +
+                      '<li><a href="https://www.hit-u.ac.jp/" target="_blank">一橋大学</a></li>' +
+                      '<li><a href="https://www.bun.kyoto-u.ac.jp//" target="_blank">京都大学 文学部</a></li>' +
+                      '</ul>'
+                      
+                      if (hensachi === 'medium')
+            message = '<b>文系に興味があるなら、文学部や法学部、社会学部などがおすすめです。</b><ul>' +
+                      '<li><a href="https://www.hosei.ac.jp/bungaku/?auth=9abbb458a78210eb174f4bdd385bcf54/" target="_blank">法政大学</a></li>' +
+                      '<li><a href="https://www.chiba-u.ac.jp/organisation/index.html/" target="_blank">千葉大学</a></li>' +
+                      '<li><a href="https://www.toyo.ac.jp//" target="_blank">東洋大学</a></li>' +
+                      '</ul>'
+
+                      if (hensachi === 'low')
+            message = '<b>文系に興味があるなら、文学部や法学部、社会学部などがおすすめです。</b><ul>' +
+                      '<li><a href="https://www.ndsu.ac.jp/" target="_blank">ノートルダム清心大学</a></li>' +
+                      '<li><a href="https://www.tohoku-gakuin.ac.jp//" target="_blank">東北学院大学院</a></li>' +
+                      '<li><a href="https://www.u-ryukyu.ac.jp//" target="_blank">琉球大学</a></li>' +
+                      '</ul>'
+            
+          }
+
+         else if (interest === 'art') {
+            if (hensachi === 'high')
+            message = '<b>アートに興味があるなら、美術大学やデザイン専門学校がおすすめです。</b><ul>' +
+                      '<li><a href="https://www.kyoto-wu.ac.jp/nyushi/daigaku/senkou/kaseigakubu.html/" target="_blank">京都女子大学</a></li>' +
+                      '<li><a href="https://www.tuad.ac.jp/academics//" target="_blank">東京芸術工科大学</a></li>' +
+                      '<li><a href="https://www.tamabi.ac.jp//" target="_blank">多摩美術大学</a></li>' +
+                      '</ul>'
+                      
+                      if (hensachi === 'medium')
+            message = '<b>アートに興味があるなら、美術大学やデザイン専門学校がおすすめです。</b><ul>' +
+                      '<li><a href="https://www.kindai.ac.jp/lit-art-cul//" target="_blank">近畿大学 文芸学部</a></li>' +
+                      '<li><a href="https://www.musabi.ac.jp//" target="_blank">武蔵野美術大学</a></li>' +
+                      '<li><a href="https://www.nuas.ac.jp//" target="_blank">名古屋芸術大学</a></li>' +
+                      '</ul>'
+
+                      if (hensachi === 'low')
+            message = '<b>アートに興味があるなら、美術大学やデザイン専門学校がおすすめです。</b><ul>' +
+                      '<li><a href="https://www.tdg.ac.jp//" target="_blank">デザイン専門学校 東京デザイナー・アカデミー</a></li>' +
+                      '<li><a href="https://www.tda.ac.jp//" target="_blank">東京デザイン専門学校</a></li>' +
+                      '<li><a href="https://npi.ac.jp//" target="_blank">日本写真芸術専門学校</a></li>' +
+                      '</ul>'
+            
+          }
+
+
+          else if (interest === 'business') {
+            if (hensachi === 'high')
+            message = '<b>ビジネスに興味があるなら、経済学部や商学部、経営学部がぴったりです。</b><ul>' +
+                      '<li><a href="https://www.econ.osaka-u.ac.jp//" target="_blank">大阪大学 経済学部</a></li>' +
+                      '<li><a href="https://www.econ.ynu.ac.jp//" target="_blank">横浜国立大学 経済学部</a></li>' +
+                      '<li><a href="https://www.econ.kyushu-u.ac.jp//" target="_blank">九州大学</a></li>' +
+                      '</ul>'
+                      
+                      if (hensachi === 'medium')
+            message = '<b>ビジネスに興味があるなら、経済学部や商学部、経営学部がぴったりです。</b><ul>' +
+                      '<li><a href="https://www.econ.nagasaki-u.ac.jp//" target="_blank">長崎大学 経済学部</a></li>' +
+                      '<li><a href="https://www.shinshu-u.ac.jp/faculty/econlaw//" target="_blank">信州大学 経法学部</a></li>' +
+                      '<li><a href="https://www.tcue.ac.jp//" target="_blank">高崎経済大学</a></li>' +
+                      '</ul>'
+
+                      if (hensachi === 'low')
+            message = '<b>ビジネスに興味があるなら、経済学部や商学部、経営学部がぴったりです。</b><ul>' +
+                      '<li><a href="https://www.tsb-yyg.ac.jp//" target="_blank">東京ビジネス・アカデミー</a></li>' +
+                      '<li><a href="https://www.nsb.ac.jp//" target="_blank">専門学校名古屋ビジネス・アカデミー</a></li>' +
+                      '<li><a href="https://www.ota.ac.jp/info//" target="_blank">太田太田情報商科専門学校</a></li>' +
+                      '</ul>'
+            
+          }
+
+
+          else if (interest === 'health') {
+            if (hensachi === 'high')
+            message = '<b>医療や福祉に興味があるなら、看護学部や医学部、福祉系学部がおすすめです。</b><ul>' +
+                      
+                      '<li><a href="https://www.keio.ac.jp/ja//" target="_blank">慶應義塾大学</a></li>' +
+                      '<li><a href="https://www.showa-u.ac.jp//" target="_blank">昭和大学</a></li>' +
+                      '<li><a href="https://www.juntendo.ac.jp//" target="_blank">順天堂大学</a></li>' +
+                      '</ul>'
+                      
+                      if (hensachi === 'medium')
+            message = '<b>医療や福祉に興味があるなら、看護学部や医学部、福祉系学部がおすすめです。</b><ul>' +
+                      '<li><a href="https://www.kyorin-u.ac.jp//" target="_blank">杏林大学</a></li>' +
+                      '<li><a href="https://www.akita-u.ac.jp/honbu//" target="_blank">秋田大学</a></li>' +
+                      '<li><a href="https://www.teikyo-u.ac.jp//" target="_blank">帝京大学</a></li>' +
+                      '</ul>'
+
+                      if (hensachi === 'low')
+            message = '<b>医療や福祉に興味があるなら、看護学部や医学部、福祉系学部がおすすめです。</b><ul>' +
+                      '<li><a href="https://www.459.ac.jp//" target="_blank">四国医療専門学校</a></li>' +
+                      '<li><a href="https://yokohama-ns.ac.jp//" target="_blank">横浜未来看護専門学校</a></li>' +
+                      '<li><a href="https://www.fukuiryo.ac.jp//" target="_blank">福山医療専門学校</a></li>' +
+                      '</ul>'
+            
+          }
+
+          
+        }
+      } else if (path === 'work') {
+        if (interest === 'language') {
+          switch (language) {
+            case 'english':
+              message = '<b>英語を活かせる就職候補</b><ul>' +
+                        '<li><a href="https://www.jera.co.jp/employment/newgraduate//" target="_blank">株式会社ＪＥＲＡ</a></li>' +
+                        '<li><a href="https://www.melco-trading.net/recruit//" target="_blank">三菱電機トレーディング株式会社</a></li>' +
+                        '<li><a href="https://www.jtbcorp.jp/jp/job_offer//" target="_blank">JTB</a></li>' +
+                        '</ul>';
+
+              break;
+              case 'french':
+              message = '<b>フランス語を活かせる就職候補:</b><ul>' +
+                        '<li><a href="http://www.haneda-hps.co.jp/recruit//" target="_blank">羽田空港旅客サービス</a></li>' +
+                        '<li><a href="https://www.hankyu-travel.co.jp/recruit/fresh//" target="_blank">阪急交通社</a></li>' +
+                        '<li><a href="https://www.teikyo-u.ac.jp//" target="_blank">EXO</a></li>' +
+                        '</ul>';
+              break;
+              case 'chinese':
+              message = '<b>中国語を活かせる就職候補:</b><ul>' +
+                        '<li><a href="https://www.cts-airport-job.jp//" target="_blank">新千歳空港</a></li>' +
+                        '<li><a href="https://www.airchina.jp/JP/JP/about-us/recruitment//" target="_blank">中国国際航空</a></li>' +
+                        '<li><a href="https://recruit.usj.co.jp/career//" target="_blank">Universal Studios Japan</a></li>' +
+                        '</ul>';
+            break;
+            case 'spanish':
+              message = '<b>スペイン語を活かせる就職候補:</b><ul>' +
+                        '<li><a href="https://recruit.jobcan.jp/travelex/" target="_blank">トラベレックスジャパン</a></li>' +
+                        '<li><a href="https://www.moritaco.co.jp/recruit.html/" target="_blank">森田産業株式会社</a></li>' +
+                        '<li><a href="https://recruit.berlitz.co.jp//" target="_blank">Berlitz</a></li>' +
+                        '</ul>';
+            break;
+            case 'korean':
+              message = '<b>韓国語を活かせる就職候補:</b><ul>' +
+                        '<li><a href="https://corp.jaldfs.co.jp/recruit//" target="_blank">空港免税店</a></li>' +
+                        '<li><a href="https://www.castingline.net//" target="_blank">東京ディズニーランド</a></li>' +
+                        '<li><a href="hhttps://casting.disneyhotels.jp//" target="_blank">ミラコスタ</a></li>' +
+                        '</ul>';
+            break;
+           case 'german':
+              message = '<b>ドイツ語を活かせる就職候補:</b><ul>' +
+                        '<li><a href="https://www.goldmansachs.com/japan/careers/" target="_blank">Goldman Sachs</a></li>' +
+                        '<li><a href="https://recruit.ecc.jp/info//" target="_blank">ECC</a></li>' +
+                        '<li><a href="https://www.jinkosolar.com/jp/" target="_blank">Jinko Solar</a></li>' +
+                        '</ul>';
+              break;
+              
+          }
+        } else if (interest === 'science') {
+          message = '<b>理系分野での就職候補:</b><ul>' +
+                    '<li><a href="https://www.docomo.ne.jp//" target="_blank">NTTdocomo</a></li>' +
+                    '<li><a href="https://group.ntt/jp//" target="_blank">NTT</a></li>' +
+                    '<li><a href="https://www.lycorp.co.jp/ja/recruit/newgrads//" target="_blank">Yahoo</a></li>' +
+                    '</ul>';
+        }
+
+        else if (interest === 'humanities') {
+          message = '<b>文系分野での就職候補:</b><ul>' +
+                    '<li><a href="https://www.nitorihd.co.jp/recruit//" target="_blank">ニトリ</a></li>' +
+                    '<li><a href="https://www.mizuho-fg.co.jp/saiyou/index.html/" target="_blank">みずほフィナンシャルグループ</a></li>' +
+                    '<li><a href="https://career.itochu.co.jp/student//" target="_blank">伊藤忠商事</a></li>' +
+                    '</ul>';
+        }
+
+        else if (interest === 'art') {
+          message = '<b芸術分野での主な就職先候補としては、広告業界や、アパレル業界、他にもゲーム業界などがあります</b><ul>' +
+                    '<li><a href="https://group.kadokawa.co.jp/recruit//" target="_blank">KADOKAWA</a></li>' +
+                    '<li><a href="https://www.fastretailing.com/employment/ja/uniqlo/jp//" target="_blank">ユニクロ</a></li>' +
+                    '<li><a href="https://www.bandai.co.jp/recruit//" target="_blank">バンダイ</a></li>' +
+                    '</ul>';
+        }
+
+        else if (interest === 'business') {
+          message = '<b>ビジネス分野での就職候補:</b><ul>' +
+                    '<li><a href="https://www.boj.or.jp/about/recruit/fresh/information/index.htm/" target="_blank">日本銀行</a></li>' +
+                    '<li><a href="https://recruit.mitsuifudosan.co.jp/shinsotsu//" target="_blank">三井不動産</a></li>' +
+                    '<li><a href="https://www.abeam.com/jp/ja/recruit//" target="_blank">アビームコンサルティング</a></li>' +
+                    '</ul>';
+        }
+
+        else if (interest === 'health') {
+          message = '<b>医療、福祉分野での就職候補:</b><ul>' +
+                    '<li><a href="https://www.jeed.go.jp/location/chiiki/gunma/index.html/" target="_blank">群馬障害者職業センター</a></li>' +
+                    '<li><a href="https://hidaka-kai.or.jp/pages/362//" target="_blank">日光病院</a></li>' +
+                    '<li><a href="https://www.sato-hospital.gr.jp/hospital-introduction/recruitment_information//" target="_blank">佐藤病院</a></li>' +
+                    '</ul>';
+        }
+      } else {
+        message = '進路を選択してください。';
+      }
+
+      recommendation.innerHTML = message;
+    }
+  </script>
+</body>
+</html>
+
+
+
